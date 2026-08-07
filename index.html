@@ -38,7 +38,7 @@
     color:var(--text); font-family:'Segoe UI',system-ui,sans-serif;
     min-height:100vh; display:flex; flex-direction:column;
     align-items:center; justify-content:flex-start;
-    padding:24px 24px 60px; gap:16px; position:relative; background:var(--bg);
+    padding:calc(24px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(60px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left)); gap:16px; position:relative; background:var(--bg);
     transition:background 0.3s, color 0.3s;
   }
   #bgLayer {
@@ -48,9 +48,9 @@
   }
   #bgLayer .tab { background:transparent; border:none; box-shadow:none; font-size:32px; line-height:2.6; transform:scale(2.2); white-space:pre; text-align:center; }
 
-  .lang-bar { position:absolute; top:14px; left:16px; z-index:20; display:flex; gap:6px; }
-  .credit{ position:absolute; top:16px; right:18px; z-index:20; font-size:11px; font-weight:600; color:var(--dim); letter-spacing:0.3px; text-align:right; max-width:220px; line-height:1.4; pointer-events:none; }
-  .share-btn{ position:absolute; right:18px; top:52px; z-index:25; width:44px; height:44px; padding:0; font-size:18px; border-radius:50%; background:var(--panel); border:none; color:var(--text); box-shadow:var(--nm-out); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .lang-bar { position:absolute; top:calc(14px + env(safe-area-inset-top)); left:calc(16px + env(safe-area-inset-left)); z-index:20; display:flex; gap:6px; }
+  .credit{ position:absolute; top:calc(16px + env(safe-area-inset-top)); right:calc(18px + env(safe-area-inset-right)); z-index:20; font-size:11px; font-weight:600; color:var(--dim); letter-spacing:0.3px; text-align:right; max-width:220px; line-height:1.4; pointer-events:none; }
+  .share-btn{ position:absolute; right:calc(18px + env(safe-area-inset-right)); top:calc(52px + env(safe-area-inset-top)); z-index:25; width:44px; height:44px; padding:0; font-size:18px; border-radius:50%; background:var(--panel); border:none; color:var(--text); box-shadow:var(--nm-out); cursor:pointer; display:flex; align-items:center; justify-content:center; }
   .share-btn:hover{ color:var(--cyan-text); }
   .share-btn:active{ box-shadow:var(--nm-in); }
   .share-btn.copied{ color:var(--cyan-text); }
@@ -316,14 +316,14 @@
   body.practice .strip-wrap{max-width:96vw;height:240px;}
   body.practice .strip-wrap.vertical{height:78vh;}
   body.practice .main-2col{ flex-direction:column; gap:0; }
-  body.practice .col-stage{ position:static; width:100%; align-items:center; justify-content:center; min-height:70vh; }
+  body.practice .col-stage{ position:static; width:100%; align-items:center; justify-content:center; min-height:70vh; padding-bottom:120px; }
   body.practice .col-controls{ display:none; }
-  .exit-practice{display:none;position:fixed;top:14px;right:16px;z-index:30;}
+  .exit-practice{display:none;position:fixed;top:calc(14px + env(safe-area-inset-top));right:calc(16px + env(safe-area-inset-right));z-index:30;}
   body.practice .exit-practice{display:block;}
   body.practice{ padding-bottom:110px; }
   .practice-bar{ display:none; }
   body.practice .practice-bar{
-    display:flex; position:fixed; left:50%; bottom:18px; transform:translateX(-50%); z-index:30;
+    display:flex; position:fixed; left:50%; bottom:calc(18px + env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:30;
     align-items:center; gap:12px; flex-wrap:wrap; justify-content:center;
     background:var(--panel); border-radius:18px; padding:12px 20px; box-shadow:var(--nm-out);
   }
@@ -349,6 +349,12 @@
       <span class="pbpm-val" id="pBpmVal">65</span>
       <span class="pbpm-unit">BPM</span>
       <button class="pbtn small" id="pBpmUp">+</button>
+    </div>
+    <div class="pbpm">
+      <button class="pbtn small" id="pSpdDown">−</button>
+      <span class="pbpm-val" id="pSpdVal">4.0</span>
+      <span class="pbpm-unit">배속</span>
+      <button class="pbtn small" id="pSpdUp">+</button>
     </div>
     <button class="pbtn" id="pRandom" data-i18n="order_random">🎲 랜덤</button>
     <button class="pbtn" id="pDir">↕</button>
@@ -1515,11 +1521,14 @@
 
   function syncPracticeBar(){
     $('pBpmVal').textContent=getBpm();
+    const sv=$('pSpdVal'); if(sv) sv.textContent=noteSpeed.toFixed(1);
     const s=$('pStart'); s.textContent=isPlaying?t('stop_warmup'):t('start_warmup'); s.classList.toggle('playing',isPlaying);
   }
   $('pStart').addEventListener('click',()=>{ toggleMetro(); syncPracticeBar(); });
   $('pBpmDown').addEventListener('click',()=>{ setBpm(getBpm()-5); syncPracticeBar(); });
   $('pBpmUp').addEventListener('click',()=>{ setBpm(getBpm()+5); syncPracticeBar(); });
+  $('pSpdDown').addEventListener('click',()=>{ setNoteSpeed(noteSpeed-0.5); syncPracticeBar(); });
+  $('pSpdUp').addEventListener('click',()=>{ setNoteSpeed(noteSpeed+0.5); syncPracticeBar(); });
   $('pRandom').addEventListener('click',()=>{ if(!isPlaying) generate(true); });
   $('pDir').addEventListener('click',()=>{
     const nv = isVertical()?'h':'v'; $('scrollDir').value=nv;
